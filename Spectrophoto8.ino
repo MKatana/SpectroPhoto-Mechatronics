@@ -10,6 +10,7 @@
 #include "Vrekrer_scpi_parser.h"
 #include "Constants.h"
 #include "Config.h"
+#include "Temperature.h"
 
 #define STEPPER_STEP_PIN      2
 #define STEPPER_DIR_PIN       5
@@ -25,7 +26,7 @@
 AccelStepper stepper(AccelStepper::DRIVER, STEPPER_STEP_PIN, STEPPER_DIR_PIN);
 long currentStepPosition = 0;  // Absolute tracker (microsteps)
 
-const char SW_REVISION[] = "3.2";
+const char SW_REVISION[] = "3.7";
 
 // Define global config variable
 Config config;
@@ -49,6 +50,8 @@ void applyMotionConfig() {
 void setup() {
   Serial.begin(115200);
 
+  _delay_ms(1000);
+
   Serial.println(F("Spectrophotometer mechanical subasembly starting up..."));
 
   ReadConfigFromEEPROM();
@@ -70,7 +73,9 @@ void setup() {
   
   SCPIInit();
 
-  analogReference(DEFAULT);
+  tempInit();
+  Serial.print("Current chamber temperature: ");
+  print_temp(6);
 
   pinMode(FAN_MOSFET_PIN, OUTPUT);
   pinMode(HEATER_MOSFET_PIN, OUTPUT);
@@ -84,10 +89,6 @@ void setup() {
 
   print_config();
 
-
-
-  Serial.print("Current temperature: ");
-  print_temp(6);
   
   Serial.println("Initializing carousel...");
   carouselInitStatus = initializeCarousel();

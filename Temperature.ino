@@ -1,27 +1,113 @@
-#include "Oversampling.h"
+#include <Wire.h>
+#include <math.h>
 
-const float R_FIXED = 10000.0;    // ohms
-const float R0 = 10000.0;         // NTC nominal resistance at T0 (ohms)
-const float BETA = 3850.0;        // Beta constant (K)
-const float T0 = 25.0 + 273.15;   // 25°C in Kelvin
-const int ADC_BITS = 16;          // Number of ADC bits
-const int AVG_SAMPLES = 1;        // Number of averaged samples
+#define ADC_ADDR 0x68
 
-Oversampling oversampledADC(10, ADC_BITS, AVG_SAMPLES);
+const float VDIV = 3.30;
+const float R_FIXED = 4700.0;
+const float R0 = 10000.0;
+const float BETA = 3950.0;
+const float T0 = 298.15;
+const float LSB = 62.5e-6;
 
-float temp_read(){
+const unsigned long ADC_TIMEOUT_MS = 100;
 
-unsigned int adcValue = oversampledADC.read(NTC_PIN);
+bool tempSensorPresent = false;
 
-  float v = adcValue / (pow(2,ADC_BITS)-1); // Resistor ratio value from 0 to 1
-  float R_NTC = R_FIXED * v / (1.0 - v);  // R = Rf * v/(1-v)
-  float invT = (1.0 / T0) + (1.0 / BETA) * log(R_NTC / R0);
-  float T_kelvin = 1.0 / invT;
-  float T_celsius = T_kelvin - 273.15;
-  return T_celsius;
+bool adcPresent() {
+  Wire.beginTransmission(ADC_ADDR);
+  return (Wire.endTransmission() == 0);
 }
 
-void print_temp(int dec){
-  float temp=temp_read();
-  Serial.println(temp, dec);
+bool tempInit() {
+  Wire.begin();
+
+  if (!adcPresent()) {
+    Serial.println(F("ERROR: MCP3421 not detected"));
+    tempSensorPresent = false;
+    return false;
+  }
+
+  Serial.println(F("MCP3421 detected"));
+
+  // Continuous conversion, 16-bit, gain = 1
+  Wire.beginTransmission(ADC_ADDR);
+  Wire.write(0x18);
+
+  if (Wire.endTransmission() != 0) {
+    Serial.println(F("ERROR: MCP3421 configuration failed"));
+    tempSensorPresent = false;
+    return false;
+  }
+
+  tempSensorPresent = true;
+  return true;
+}
+
+bool readADC(long &value) {
+  unsigned long t0 = millis();
+
+  while (millis() - t0 < ADC_TIMEOUT_MS) {
+    Wire.requestFrom((uint8_t)ADC_ADDR, (uint8_t)3);
+
+    if (Wire.available() != 3) {
+      delay(1);
+      continue;
+    }
+
+    long raw = 0;
+
+    raw |= (long)Wire.read() << 8;
+    raw |= (long)Wire.read();
+
+    byte config = Wire.read();
+
+    if ((config & 0x80) == 0) {
+      if (raw & 0x8000) {
+        raw |= 0xFFFF0000;
+      }
+
+      value = raw;
+      return true;
+    }
+
+    delay(1);
+  }
+
+  return false;
+}
+
+bool tempReadC(float &tempC) {
+  long raw;
+
+  if (!tempSensorPresent) {
+    return false;
+  }
+
+  if (!readADC(raw)) {
+    return false;
+  }
+
+  float v = raw * LSB;
+
+  if (v <= 0.0 || v >= 2.048) {
+    return false;
+  }
+
+  float r_ntc = R_FIXED * (VDIV / v - 1.0);
+  float tempK = 1.0 / ((1.0 / T0) + log(r_ntc / R0) / BETA);
+
+  tempC = tempK - 273.15;
+  return true;
+}
+
+void print_temp(int dec) {
+  float tempC;
+
+  if (!tempReadC(tempC)) {
+    Serial.println(F("TEMP_READ_ERROR"));
+    return;
+  }
+
+  Serial.println(tempC, dec);
 }

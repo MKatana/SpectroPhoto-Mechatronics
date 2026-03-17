@@ -2,11 +2,14 @@
 #include "Vrekrer_scpi_parser.h"
 #include "Constants.h"
 #include "Config.h"
+#include "Temperature.h"
+#include <avr/wdt.h>
 
 SCPI_Parser my_instrument;
 
 // Prototypes
 void Identify(SCPI_Commands, SCPI_Parameters, Stream&);
+void ResetBoard(SCPI_Commands, SCPI_Parameters, Stream&);
 void Help(SCPI_Commands, SCPI_Parameters, Stream&);
 void GetDoor(SCPI_Commands, SCPI_Parameters, Stream&);
 void SetLamp(SCPI_Commands, SCPI_Parameters, Stream&);
@@ -45,6 +48,7 @@ void SCPIInit() {
 
   // Register commands
   my_instrument.RegisterCommand(F("*IDN?"), &Identify);  //works
+  my_instrument.RegisterCommand(F("*RST"), &ResetBoard);
   my_instrument.RegisterCommand(F("HELP"), &Help);  //works
   my_instrument.RegisterCommand(F("DOOr?"), &GetDoor);  //works
   my_instrument.RegisterCommand(F("LAMp?"), &GetLamp);  //works
@@ -86,6 +90,16 @@ extern const char SW_REVISION[];  // declare the variable if defined elsewhere
 void Identify(SCPI_C commands, SCPI_P parameters, Stream& interface) {
   Serial.print(F("Katana, Spectrophotometer Mechanical Subsystem, #01, "));
   Serial.println(SW_REVISION);
+}
+
+void ResetBoard(SCPI_C commands, SCPI_P parameters, Stream& interface) {
+  Serial.println(F("Resetting controller..."));
+  Serial.flush();
+  delay(10);
+  wdt_enable(WDTO_15MS);
+
+  while (true) {
+  }
 }
 
 void ReadEEPROM(SCPI_C commands, SCPI_P parameters, Stream& interface) {
@@ -185,7 +199,14 @@ void GetLamp(SCPI_C commands, SCPI_P parameters, Stream& interface) {
 }
 
 void GetTemp(SCPI_C commands, SCPI_P parameters, Stream& interface) {
-  print_temp(6);
+  float tempC;
+
+  if (!tempReadC(tempC)) {
+    Serial.println(F("TEMP_READ_ERROR"));
+    return;
+  }
+
+  Serial.println(tempC, 6);
 }
 
 void SetTemp(SCPI_C commands, SCPI_P parameters, Stream& interface) {
