@@ -1,0 +1,17 @@
+.arduinoIDE/
+build/
+dist/
+
+*.elf
+*.hex
+*.bin
+*.map
+*.eep
+
+*.tmp
+*.temp
+*.bak
+*.orig
+
+.DS_Store
+Thumbs.db
