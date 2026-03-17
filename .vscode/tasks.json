@@ -1,0 +1,77 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Arduino: Compile",
+      "type": "shell",
+      "command": "C:\\Program Files\\Arduino IDE\\resources\\app\\lib\\backend\\resources\\arduino-cli.exe",
+      "args": [
+        "compile",
+        "--fqbn",
+        "arduino:avr:uno",
+        "${workspaceFolder}"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$gcc",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Arduino: Upload",
+      "type": "shell",
+      "command": "C:\\Program Files\\Arduino IDE\\resources\\app\\lib\\backend\\resources\\arduino-cli.exe",
+      "args": [
+        "upload",
+        "-p",
+        "${input:serialPort}",
+        "--fqbn",
+        "arduino:avr:uno",
+        "${workspaceFolder}"
+      ],
+      "dependsOn": "Arduino: Compile",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Arduino: Monitor",
+      "type": "shell",
+      "command": "C:\\Program Files\\Arduino IDE\\resources\\app\\lib\\backend\\resources\\arduino-cli.exe",
+      "args": [
+        "monitor",
+        "-p",
+        "${input:serialPort}",
+        "--config",
+        "baudrate=9600"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "serialPort",
+      "type": "pickString",
+      "description": "Select the Arduino serial port",
+      "default": "COM5",
+      "options": [
+        "COM5",
+        "COM10",
+        "COM11",
+        "COM14",
+        "COM15",
+        "COM9"
+      ]
+    }
+  ]
+}

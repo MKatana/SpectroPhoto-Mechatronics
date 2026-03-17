@@ -25,7 +25,7 @@
 AccelStepper stepper(AccelStepper::DRIVER, STEPPER_STEP_PIN, STEPPER_DIR_PIN);
 long currentStepPosition = 0;  // Absolute tracker (microsteps)
 
-const char SW_REVISION[] = "3.1";
+const char SW_REVISION[] = "3.2";
 
 // Define global config variable
 Config config;
@@ -47,7 +47,7 @@ void applyMotionConfig() {
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   Serial.println(F("Spectrophotometer mechanical subasembly starting up..."));
 

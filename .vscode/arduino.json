@@ -1,0 +1,6 @@
+{
+  "sketch": "Spectrophoto8.ino",
+  "board": "arduino:avr:uno",
+  "port": "COM5",
+  "output": "build"
+}

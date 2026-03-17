@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Arduino Firmware Workflow",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "C:\\Windows\\System32\\cmd.exe",
+      "args": [
+        "/c",
+        "echo This project targets an Arduino Uno and is not debugged as a native Windows C++ program. && echo Use VS Code Tasks: Arduino: Compile, Arduino: Upload, and Arduino: Monitor. && pause"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "preLaunchTask": "Arduino: Compile"
+    }
+  ]
+}
