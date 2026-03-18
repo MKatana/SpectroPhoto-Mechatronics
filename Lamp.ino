@@ -1,3 +1,5 @@
+#include "Pins.h"
+
 void lamp(bool value){
   lampEnabled = value;
   if(value==true){

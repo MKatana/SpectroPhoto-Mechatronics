@@ -63,8 +63,9 @@
       "id": "serialPort",
       "type": "pickString",
       "description": "Select the Arduino serial port",
-      "default": "COM5",
+      "default": "COM2",
       "options": [
+        "COM2",
         "COM5",
         "COM10",
         "COM11",

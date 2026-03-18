@@ -1,4 +1,4 @@
-#define SCPI_ARRAY_SYZE 2            //Max branches of the command tree and max number of parameters.
+#define SCPI_ARRAY_SYZE 4            //Max branches of the command tree and max number of parameters.
 #define SCPI_MAX_TOKENS 30           //Max number of valid tokens.
 #define SCPI_MAX_COMMANDS 30         //Max number of registered commands.
 #define SCPI_MAX_SPECIAL_COMMANDS 0  //Max number of special commands.
@@ -10,18 +10,11 @@
 #include "Vrekrer_scpi_parser.h"
 #include "Constants.h"
 #include "Config.h"
+#include "Pins.h"
+#include "Carousel.h"
+#include "Door.h"
+#include "PID.h"
 #include "Temperature.h"
-
-#define STEPPER_STEP_PIN      2
-#define STEPPER_DIR_PIN       5
-#define STEPPER_ENABLE_PIN    8  // Active high
-#define HOME_SENSOR_POWER_PIN A0
-#define HOME_SENSOR_PIN       A1  // Active LOW sensor
-#define NTC_PIN               A2
-#define DOOR_PIN              A3
-#define HEATER_MOSFET_PIN     6
-#define LAMP_MOSFET_PIN       13
-#define FAN_MOSFET_PIN        7
 
 AccelStepper stepper(AccelStepper::DRIVER, STEPPER_STEP_PIN, STEPPER_DIR_PIN);
 long currentStepPosition = 0;  // Absolute tracker (microsteps)
@@ -37,6 +30,7 @@ extern SCPI_Parser my_instrument;
 extern void SCPIInit();
 
 bool carouselInitialized = false;
+bool motionActive = false;
 bool temperatureControl = false;
 bool lampEnabled = false;
 int carouselInitStatus = 0;
@@ -84,6 +78,7 @@ void setup() {
 
   pinMode(STEPPER_ENABLE_PIN, OUTPUT);
   digitalWrite(STEPPER_ENABLE_PIN, LOW); // Enable stepper driver
+  doorInterruptInit();
 
   applyMotionConfig();
 
@@ -97,5 +92,8 @@ void setup() {
 }
 
 void loop() {
+  processDoorInterrupt();
+  serviceMotion();
+  serviceTemperatureControl();
   my_instrument.ProcessInput(Serial, "\n");
 }
