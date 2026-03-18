@@ -3,7 +3,7 @@
 #include "Temperature.h"
 #include "PID.h"
 
-constexpr unsigned long PID_SAMPLE_MS = 150;
+constexpr unsigned long PID_SAMPLE_MS = 80;
 constexpr unsigned long HEATER_WINDOW_MS = 1000;
 constexpr unsigned long PID_REPORT_MS = 1000;
 constexpr float PID_INTEGRAL_MIN = -100.0f;

@@ -34,6 +34,8 @@ void MoveToStep(SCPI_Commands, SCPI_Parameters, Stream&);
 void GetStepPos(SCPI_Commands, SCPI_Parameters, Stream&);
 void SetOffset(SCPI_Commands, SCPI_Parameters, Stream&);
 void GetOffset(SCPI_Commands, SCPI_Parameters, Stream&);
+void SetSlotOffset(SCPI_Commands, SCPI_Parameters, Stream&);
+void GetSlotOffset(SCPI_Commands, SCPI_Parameters, Stream&);
 void SetMaxSpeed(SCPI_Commands, SCPI_Parameters, Stream&);
 void GetMaxSpeed(SCPI_Commands, SCPI_Parameters, Stream&);
 void SetAcceleration(SCPI_Commands, SCPI_Parameters, Stream&);
@@ -78,6 +80,8 @@ void SCPIInit() {
     my_instrument.RegisterCommand(F(":STEP?"), &GetStepPos); //NOT WORKING
     my_instrument.RegisterCommand(F(":OFFset"), &SetOffset); //  working
     my_instrument.RegisterCommand(F(":OFFset?"), &GetOffset); //  working
+    my_instrument.RegisterCommand(F(":SLOToffset"), &SetSlotOffset);
+    my_instrument.RegisterCommand(F(":SLOToffset?"), &GetSlotOffset);
     my_instrument.RegisterCommand(F(":MAXSPeed"), &SetMaxSpeed); //  working
     my_instrument.RegisterCommand(F(":MAXSPeed?"), &GetMaxSpeed); //  working
     my_instrument.RegisterCommand(F(":ACCeleration"), &SetAcceleration); //  working
@@ -143,6 +147,15 @@ void SetOffset(SCPI_C commands, SCPI_P parameters, Stream& interface) {
 
 void GetOffset(SCPI_C commands, SCPI_P parameters, Stream& interface) {
   Serial.println(config.offset);
+}
+
+void SetSlotOffset(SCPI_C commands, SCPI_P parameters, Stream& interface) {
+  config.slot_offset = constrain(String(parameters[0]).toInt(), -400, 400);
+  Serial.println(config.slot_offset);
+}
+
+void GetSlotOffset(SCPI_C commands, SCPI_P parameters, Stream& interface) {
+  Serial.println(config.slot_offset);
 }
 
 void SetMaxSpeed(SCPI_C commands, SCPI_P parameters, Stream& interface) {
@@ -276,6 +289,8 @@ void Help(SCPI_C commands, SCPI_P parameters, Stream& interface) {
   Serial.println(F("   :STEP # - go to motor step (0-10080)"));
   Serial.println(F("   :OFFSet? - read home sensor offset value"));
   Serial.println(F("   :OFFSet # - set offset from home sensor (-200-200)"));
+  Serial.println(F("   :SLOToffset? - read slot-to-door alignment offset"));
+  Serial.println(F("   :SLOToffset # - set slot-to-door alignment offset (-400-400)"));
   Serial.println(F("   :MAXSpeed? - read the max speed parameter"));
   Serial.println(F("   :MAXSpeed # - set max speed parameter (100-10000)"));
   Serial.println(F("   :ACCeleration? - read the acceleration parameter"));

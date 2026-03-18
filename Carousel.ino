@@ -131,8 +131,24 @@ int initializeCarousel() {
 
     if (digitalRead(HOME_SENSOR_PIN) == HIGH) {  // Sensor active
       stepper.setSpeed(0);
-      currentStepPosition = INIT_OFFSET + config.offset;
+      currentStepPosition = config.offset;
       stepper.setCurrentPosition(currentStepPosition);
+
+      stepper.moveTo(0);
+      while (stepper.distanceToGo() != 0) {
+        stepper.run();
+
+        if (processDoorInterrupt(false)) {
+          stepper.setSpeed(0);
+          Serial.println(F("Unable to initialize carousel. Door is opened."));
+          carouselInitialized = false;
+          carouselInitStatus = 4;
+          setMotionThermalInterlock(false);
+          return 4;
+        }
+      }
+
+      currentStepPosition = stepper.currentPosition();
       Serial.println(F("Carousel initialized."));
       carouselInitialized = true;
       motionActive = false;
@@ -155,7 +171,7 @@ void moveToCuvette(int index) {
     return;
   }
 
-  long targetSteps = config.offset + (getCarouselPosition(index - 1) * MICROSTEPPING_FACTOR);
+  long targetSteps = getCarouselPosition(index - 1) * MICROSTEPPING_FACTOR;
 
   currentStepPosition = stepper.currentPosition();
   long normCurrent = ((currentStepPosition % FULL_ROTATION_STEPS) + FULL_ROTATION_STEPS) % FULL_ROTATION_STEPS;
@@ -183,7 +199,7 @@ void moveToSlot(int slot) {
     return;
   }
 
-  long targetSteps = config.offset + ((long)(slot - 1) * SLOT_SPACING_STEPS * MICROSTEPPING_FACTOR);
+  long targetSteps = config.slot_offset + ((long)(slot - 1) * SLOT_SPACING_STEPS * MICROSTEPPING_FACTOR);
   startMotionToAbsolute(targetSteps);
 }
 

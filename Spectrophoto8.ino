@@ -19,7 +19,7 @@
 AccelStepper stepper(AccelStepper::DRIVER, STEPPER_STEP_PIN, STEPPER_DIR_PIN);
 long currentStepPosition = 0;  // Absolute tracker (microsteps)
 
-const char SW_REVISION[] = "3.7";
+const char SW_REVISION[] = "3.8";
 
 // Define global config variable
 Config config;

@@ -55,6 +55,7 @@ void ResetDefaultsEEPROM() {
   config.acceleration = DEFAULT_ACCELERATION;
   config.step_speed = DEFAULT_STEP_SPEED;
   config.offset = DEFAULT_OFFSET;
+  config.slot_offset = DEFAULT_SLOT_OFFSET;
   config.kp = DEFAULT_KP;
   config.ki = DEFAULT_KI;
   config.kd = DEFAULT_KD;

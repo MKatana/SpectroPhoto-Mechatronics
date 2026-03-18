@@ -4,13 +4,14 @@
 #include "Door.h"
 #include "PID.h"
 
-constexpr unsigned long DOOR_DEBOUNCE_MS = 150;
+constexpr unsigned long DOOR_DEBOUNCE_MS = 100;
 
 volatile bool doorIsrFired = false;
 volatile unsigned long doorIsrTimeMs = 0;
 
 bool interrupted = false;
 bool lastDoorOpenState = false;
+bool resumeHeatingAfterDoorClose = false;
 
 inline bool doorIsOpenFast() {
   return (PINC & _BV(PC3)) != 0;
@@ -54,6 +55,7 @@ bool processDoorInterrupt(bool allowReinitialize) {
 
   if (doorIsOpen) {
     Serial.println(F("Door opened"));
+    resumeHeatingAfterDoorClose = temperatureControl;
     heating(false);
     stepper.stop();
     stepper.setSpeed(0);
@@ -66,6 +68,12 @@ bool processDoorInterrupt(bool allowReinitialize) {
     if (allowReinitialize) {
       Serial.println(F("Initializing carousel..."));
       carouselInitStatus = initializeCarousel();
+      if (resumeHeatingAfterDoorClose && carouselInitialized) {
+        heating(true);
+      }
+    }
+    if (!allowReinitialize || carouselInitialized) {
+      resumeHeatingAfterDoorClose = false;
     }
   }
 

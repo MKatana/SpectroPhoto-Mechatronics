@@ -5,6 +5,7 @@ void print_config(){
   Serial.print(F("ACCELERATION: ")); Serial.println(config.acceleration);
   Serial.print(F("STEP_SPEED: ")); Serial.println(config.step_speed);
   Serial.print(F("OFFSET: ")); Serial.println(config.offset);
+  Serial.print(F("SLOT_OFFSET: ")); Serial.println(config.slot_offset);
   Serial.print(F("KP: ")); Serial.println(config.kp);
   Serial.print(F("KI: ")); Serial.println(config.ki);
   Serial.print(F("KD: ")); Serial.println(config.kd);

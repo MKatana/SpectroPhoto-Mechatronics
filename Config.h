@@ -8,6 +8,7 @@ struct __attribute__((packed)) Config {
   unsigned int acceleration;
   unsigned int step_speed;
   int offset;
+  int slot_offset;
   float kp;
   float ki;
   float kd;

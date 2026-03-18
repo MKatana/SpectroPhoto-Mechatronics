@@ -4,7 +4,8 @@
 const unsigned int DEFAULT_MAX_SPEED = 6000;
 const unsigned int DEFAULT_ACCELERATION = 20000;
 const unsigned int DEFAULT_STEP_SPEED = 1800;
-const int DEFAULT_OFFSET = 0;
+const int DEFAULT_OFFSET = 20;
+const int DEFAULT_SLOT_OFFSET = 280;
 const float DEFAULT_KP = 450.0;
 const float DEFAULT_KI = 35.0;
 const float DEFAULT_KD = 600.0;
