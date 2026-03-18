@@ -1,6 +1,6 @@
 #define SCPI_ARRAY_SYZE 4            //Max branches of the command tree and max number of parameters.
 #define SCPI_MAX_TOKENS 30           //Max number of valid tokens.
-#define SCPI_MAX_COMMANDS 30         //Max number of registered commands.
+#define SCPI_MAX_COMMANDS 40         //Max number of registered commands.
 #define SCPI_MAX_SPECIAL_COMMANDS 0  //Max number of special commands.
 #define SCPI_BUFFER_LENGTH 128       // Length of the message buffer.
 #define SCPI_HASH_TYPE uint8_t       // Integer size used for hashes.

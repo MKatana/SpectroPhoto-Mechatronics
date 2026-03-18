@@ -189,24 +189,3 @@ void serviceTemperatureControl() {
     Serial.println(temperatureFault ? 1 : 0);
   }
 }
-
-void getPidState(PidState &state) {
-  float liveTempC;
-  const bool liveTempValid = tempReadC(liveTempC);
-
-  if (liveTempValid) {
-    state.temperatureC = liveTempC;
-  } else {
-    state.temperatureC = lastTempC;
-  }
-
-  state.setpointC = config.set_temp;
-  state.error = lastPidError;
-  state.integral = pidIntegral;
-  state.derivative = lastPidDerivative;
-  state.outputPct = heaterOutputPct;
-  state.heaterOn = heaterState;
-  state.fanOn = fanState;
-  state.fault = temperatureFault;
-  state.validTemperature = liveTempValid || lastTempValid;
-}

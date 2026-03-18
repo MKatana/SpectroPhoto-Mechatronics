@@ -21,7 +21,6 @@ void SetTemp(SCPI_Commands, SCPI_Parameters, Stream&);
 void GetTemp(SCPI_Commands, SCPI_Parameters, Stream&);
 void SetTempCtrl(SCPI_Commands, SCPI_Parameters, Stream&);
 void GetTempCtrl(SCPI_Commands, SCPI_Parameters, Stream&);
-void GetPidState(SCPI_Commands, SCPI_Parameters, Stream&);
 void GetKp(SCPI_Commands, SCPI_Parameters, Stream&);
 void SetKp(SCPI_Commands, SCPI_Parameters, Stream&);
 void GetKi(SCPI_Commands, SCPI_Parameters, Stream&);
@@ -62,7 +61,6 @@ void SCPIInit() {
   my_instrument.SetCommandTreeBase(F("TEMP"));
     my_instrument.RegisterCommand(F(":CONtrol"), &SetTempCtrl);  //NOT WORKING
     my_instrument.RegisterCommand(F(":CONtrol?"), &GetTempCtrl);  //NOT WORKING
-    my_instrument.RegisterCommand(F(":PID:STATe?"), &GetPidState);
     my_instrument.RegisterCommand(F(":Kp?"), &GetKp);  //works
     my_instrument.RegisterCommand(F(":Kp"), &SetKp);  //works
     my_instrument.RegisterCommand(F(":Ki?"), &GetKi);  //works
@@ -232,36 +230,6 @@ void GetTempCtrl(SCPI_C commands, SCPI_P parameters, Stream& interface) {
   Serial.println(temperatureControl ? 1 : 0);
 }
 
-void GetPidState(SCPI_C commands, SCPI_P parameters, Stream& interface) {
-  PidState state;
-  getPidState(state);
-
-  if (!state.validTemperature) {
-    Serial.print(F("NaN,"));
-  } else {
-    Serial.print(state.temperatureC, 6);
-    Serial.print(',');
-  }
-
-  Serial.print(state.setpointC, 6);
-  Serial.print(',');
-  Serial.print(state.error, 6);
-  Serial.print(',');
-  Serial.print(state.integral, 6);
-  Serial.print(',');
-  Serial.print(state.derivative, 6);
-  Serial.print(',');
-  Serial.print(state.outputPct, 3);
-  Serial.print(',');
-  Serial.print(state.heaterOn ? 1 : 0);
-  Serial.print(',');
-  Serial.print(state.fanOn ? 1 : 0);
-  Serial.print(',');
-  Serial.print(state.fault ? 1 : 0);
-  Serial.print(',');
-  Serial.println(state.validTemperature ? 1 : 0);
-}
-
 void GetKp(SCPI_C commands, SCPI_P parameters, Stream& interface) {
   Serial.println(config.kp);
 }
@@ -324,11 +292,10 @@ void Help(SCPI_C commands, SCPI_P parameters, Stream& interface) {
   Serial.println(F("    # - set temperature in Celsius (20-40)"));
   Serial.println(F("    :CONtrol? - read heating status"));
   Serial.println(F("    :CONtrol # - enable or disable heating (0-1)"));
-  Serial.println(F("    :PID:STATe? - read PID state as CSV"));
   Serial.println(F("    :KP? - read P value"));
-  Serial.println(F("    :KP # - set P value (0-10)"));
+  Serial.println(F("    :KP # - set P value (0-100000)"));
   Serial.println(F("    :KI? - read I value"));
-  Serial.println(F("    :KI # - set I value (0-10)"));
+  Serial.println(F("    :KI # - set I value (0-100)"));
   Serial.println(F("    :KD? - read D value"));
-  Serial.println(F("    :KD # - set D value (0-10)"));
+  Serial.println(F("    :KD # - set D value (0-1000)"));
 }
